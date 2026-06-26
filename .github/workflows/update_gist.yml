@@ -1,34 +1,13 @@
-name: Update Config Gist
-
-on:
-  schedule:
-    - cron: '0 * * * *' # Каждый час
-  workflow_dispatch:
-
-jobs:
-  update-gist:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: pip install requests
-
-      - name: Fetch Configs
-        run: python fetch_configs.py "testdevice"
-
       - name: Update Gist
-        uses: gnikyt/gists-action@v2
-        with:
-          token: ${{ secrets.GIST_TOKEN }}
-          gistID: b715448f4378d930d82c5e6b6921c8e5
-          fileNames: 'configs.txt'
-          filePaths: './configs.txt'
-          gistDescription: 'Обновление конфигов: ${{ github.run_number }}'
-          
+        env:
+          # Здесь используем секрет, который вы создали
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          # Превращаем содержимое файла в JSON-формат для API
+          # И отправляем через API GitHub
+          curl -L \
+            -X PATCH \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"files": {"configs.txt": {"content": "'$(cat configs.txt | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')'"}}}' \
+            https://api.github.com/gists/b715448f4378d930d82c5e6b6921c8e5
