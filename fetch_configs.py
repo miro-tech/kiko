@@ -8,7 +8,7 @@ API = "https://q2a.solsticestack.ru/api/v1"
 
 HEADERS = {
     "User-Agent": "v1.7.7 Android/30 Xiaomi Mi 9",
-    "Accept": "text/plain", # Ожидаем текст
+    "Accept": "text/plain",
     "Connection": "keep-alive"
 }
 
@@ -20,23 +20,18 @@ def get_configs(hwid):
     headers = HEADERS.copy()
     headers["X-Signature"] = sig
     try:
-        # Используем r.text, так как сервер отдает чистый текст
         r = requests.get(f"{API}/sub/{hwid}", headers=headers)
-        return r.text if r.status_code == 200 else None
-    except Exception:
+        # Если API отдает JSON, то r.text может содержать экранированные \n
+        # Если API отдает просто текст, то r.text — это то, что нужно
+        return r.text.replace('\\n', '\n').replace('"', '') 
+    except Exception as e:
+        print(f"Error: {e}")
         return None
 
 if __name__ == "__main__":
-    hwid = sys.argv[1] if len(sys.argv) > 1 else "testdevice"
-    output_file = "configs.txt"
-    
+    hwid = sys.argv[1]
     data = get_configs(hwid)
     
     if data:
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(data)
-        print(f"Successfully saved {output_file}")
-    else:
-        print("Error: Could not fetch configs")
-        sys.exit(1)
-        
+        with open("configs.txt", "w", encoding="utf-8") as f:
+            f.write(data.strip())
