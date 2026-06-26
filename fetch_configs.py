@@ -17,17 +17,24 @@ def get_signature(hwid):
     return hmac.new(SECRET.encode(), hwid.encode(), hashlib.sha256).hexdigest()
 
 def clean_link(link):
-    if '?' not in link:
-        return link
+    if '#' in link:
+        base_part, name_part = link.split('#', 1)
+        name_suffix = f"#{name_part}"
+    else:
+        base_part, name_suffix = link, ""
     
-    base, params = link.split('?', 1)
+    if '?' not in base_part:
+        return f"{base_part}{name_suffix}"
+    
+    base, params = base_part.split('?', 1)
     param_list = params.split('&')
     
     # Оставляем только те параметры, которые не начинаются с alpn
     new_params = [p for p in param_list if not p.startswith('alpn=')]
     
-    # Собираем обратно
-    return f"{base}?{'&'.join(new_params)}"
+    # Собираем всё обратно
+    clean_params = f"?{'&'.join(new_params)}" if new_params else ""
+    return f"{base}{clean_params}{name_suffix}"
 
 def get_configs(hwid):
     sig = get_signature(hwid)
