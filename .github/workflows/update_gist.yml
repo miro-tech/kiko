@@ -21,13 +21,13 @@ jobs:
         run: pip install requests
 
       - name: Fetch Configs
-        run: python fetch_configs.py "ВАШ_HWID_ЗДЕСЬ"
+        run: python fetch_configs.py "testdevice"
 
       - name: Update Gist
         uses: gnikyt/gists-action@v2
         with:
           token: ${{ secrets.GIST_TOKEN }}
-          gistID: ВАШ_ID_GIST_ЗДЕСЬ
+          gistID: b715448f4378d930d82c5e6b6921c8e5
           fileNames: 'configs.txt'
           filePaths: './configs.txt'
           gistDescription: 'Обновление конфигов: ${{ github.run_number }}'
