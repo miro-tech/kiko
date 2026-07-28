@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,6 +30,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
-          # Используем встроенный GitHub CLI для обновления Gist
-          # Это намного проще и надежнее, чем curl или сторонние экшны
           gh gist edit b715448f4378d930d82c5e6b6921c8e5 --add configs.txt
+
+      - name: Push to GitVerse
+        env:
+          GV_USER: ${{ secrets.GV_USER }}
+          GV_TOKEN: ${{ secrets.GV_TOKEN }}
+        run: |
+          git clone https://${GV_USER}:${GV_TOKEN}@gitverse.ru/mirgittech/kiko.git gitverse
+
+          cp configs.txt gitverse/configs.txt
+
+          cd gitverse
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          git add configs.txt
+          git commit -m "Auto update $(date)" || exit 0
+          git push origin master
