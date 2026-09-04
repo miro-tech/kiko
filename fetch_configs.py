@@ -5,7 +5,7 @@ import sys
 import re
 
 SECRET = "b771055c82bce0948a9fe4aa3fedc95c0a40cb84ccda96afc4f17c865d7706d9"
-API = "https://hop.wormsly.online/api/v1"
+API = "https://sam.wormsly.online/api/v1"
 
 HEADERS = {
     "User-Agent": "v1.7.7 Android/30 Xiaomi Mi 9",
